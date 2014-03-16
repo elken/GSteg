@@ -1,4 +1,0 @@
-QSteg
-=====
-
-Qt Steg library
