@@ -1,5 +1,12 @@
-- toByteArray function
-- Possibly add more to utils class
-- Made decoding sodding work
+TODONE
 
+- Encoding works in CLI
+- Decoding works in CLI
 
+TODO
+
+- Get encoding working under Gtkmm context
+- Get decoding working under Gtkmm context
+- Plan the GUI
+- Drink coffee
+- Jump into a moving train
