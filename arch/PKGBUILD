@@ -1,0 +1,23 @@
+# Maintainer: Ellis Kenyo <elken dot tdos at gmail dot com>
+pkgname=gsteg
+pkgver=0.1
+pkgrel=1
+pkgdesc="GTKMM Steganography thing"
+arch=('any')
+url="github.com/elken/gsteg"
+license=('BSD')
+depends=('gtkmm3' 'intltool')
+#install=
+source=("$pkgname-$pkgver.tar.gz")
+md5sums=('da4fc3a29bf751bdc87d2a7a334c0328')
+
+build() {
+        cd "$pkgname-$pkgver"
+        ./configure --prefix=/usr
+	make
+}
+
+package() {
+        cd "$pkgname-$pkgver"
+	make DESTDIR="$pkgdir/" install
+}

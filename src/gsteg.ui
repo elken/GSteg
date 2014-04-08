@@ -214,7 +214,7 @@
         </child>
         <child>
           <object class="GtkButton" id="btn_encode">
-            <property name="label" translatable="yes">button</property>
+            <property name="label" translatable="yes">Encode</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -228,7 +228,7 @@
         </child>
         <child>
           <object class="GtkButton" id="btn_decode">
-            <property name="label" translatable="yes">button</property>
+            <property name="label" translatable="yes">Decode</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
