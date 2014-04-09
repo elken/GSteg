@@ -15,3 +15,6 @@
 # CMake dir (keeps everything tidy)
 /build
 
+# Temp crap nobody needs or wants
+*.pyc
+*.*~

@@ -1,4 +1,4 @@
-project(image_viewer CXX)
+project(gsteg CXX)
 cmake_minimum_required(VERSION 2.6)
 
 find_package(PkgConfig REQUIRED)
@@ -8,5 +8,5 @@ include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
 add_definitions(${GTKMM_CFLAGS_OTHER})
 
-add_executable(image_viewer main.cpp)
-target_link_libraries(image_viewer ${GTKMM_LIBRARIES})
+add_executable(gsteg main.cpp)
+target_link_libraries(gsteg ${GTKMM_LIBRARIES})
