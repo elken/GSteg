@@ -7,6 +7,8 @@ TODO
 
 - Get encoding working under Gtkmm context
 - Get decoding working under Gtkmm context
-- Plan the GUI
+- Make a more OOP approach
+- Get AboutDialog working
+- Plan the GUI (Kind of done, but I won't tick it off yet.)
 - Drink coffee
 - Jump into a moving train
