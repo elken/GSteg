@@ -8,5 +8,5 @@ include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
 add_definitions(${GTKMM_CFLAGS_OTHER})
 
-add_executable(gsteg main.cpp)
+add_executable(gsteg src/main.cpp src/gsteg.cpp)
 target_link_libraries(gsteg ${GTKMM_LIBRARIES})
