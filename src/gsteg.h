@@ -23,6 +23,9 @@ private:
   //Child widgets:
   Gtk::Box gsteg_box;
   Gtk::Image* gsteg_image;
+  //Gtk::Entry* gsteg_txt_in;
+  Gtk::TextView* gsteg_txt_in;
+  Gtk::ScrolledWindow* txt_no_scroll;
 
   Glib::RefPtr<Gtk::Builder> gsteg_ui;
   Glib::RefPtr<Gio::SimpleActionGroup> gsteg_ag;
