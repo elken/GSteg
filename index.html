@@ -44,17 +44,27 @@
 <h2>
 <a name="encode" class="anchor" href="#encode"><span class="octicon octicon-link"></span></a>Encode</h2>
 
-<p>Very simple, depends on "in.txt" containing the text, "in.bmp" image and "out.bmp" image. Does what you expect, moves bits, magic happens, yadda yadda.</p>
+<p>Now with the power of the GUI, encoding is a simple case of opening an image, inputting your text and clicking the encode menuitem. Bish bash bosh.
+Once you open the image, because I'm too lazy to think of a smarter way, an fstream object is defined and assigned to the path of the image. Once you hit the
+encode menuitem, it splits the object into a header and eBuf(end buffer) accesses the text within the TextBuffer via the annoying gsteg_txt_in->get_buffer()->get_text() interface,
+yes, I tried looking for something better, it doesn't exist, chucks it in after the header inbetween bytes 3&7, chosen for two reasons; because they lie in the range of characters
+that you can't input via traditional means, meaning it can take any characters you want, and because I'm a big QOTSA fan. There's also some minor memory cleanup which I will improve
+when I get time.
+</p>
 
 <h2>
 <a name="decode" class="anchor" href="#decode"><span class="octicon octicon-link"></span></a>Decode</h2>
 
-<p>Also the same, depends on "out.bmp", outputs the text. Bits are moved, yadda yadda.</p>
+<p>Also the same, except in reverse. Open your image and hit the deode menuitem. I may make it more user-friendly soon.
+Decoding is much more simple; access the fstream object, find the "3" byte, located at 0x36 in MOST BMP files, the actual location of the header is defined in the header itself, I
+might implement this later, doubtful as 99.9% are at 0x36, and add every byte until "7" to the otBuf(output text buffer), which is typecasted to a ustring so that the TextBuffer can use it.
+Memory cleanup happens, which also sucks. I'll sort if I get time.
+</p>
 
 <h1>
 <a name="gtkmm-interface" class="anchor" href="#gtkmm-interface"><span class="octicon octicon-link"></span></a>Gtkmm Interface</h1>
 
-<p>Very, very WIP, currently just an image viewer. Next step is get the image label to render in a fixed frame and I can be at peace in life.</p>
+<p>Works fine, does the job. May add something more user-friendly for decoding, but we will see.</p>
 
 <h1>
 <a name="contributions" class="anchor" href="#contributions"><span class="octicon octicon-link"></span></a>Contributions</h1>
