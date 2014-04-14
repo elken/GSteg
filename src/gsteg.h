@@ -24,10 +24,10 @@ private:
     //Child widgets:
     Gtk::Box gsteg_box;
     Gtk::Image* gsteg_image;
-    //Gtk::TextBuffer* gsteg_txt_buf;
     Gtk::TextView* gsteg_txt_in;
-    Gtk::ScrolledWindow* txt_no_scroll; 
-
+    Gtk::ScrolledWindow* gsteg_txt_no_scroll; 
+    Gtk::AboutDialog gsteg_about;
+    
     Glib::RefPtr<Gtk::Builder> gsteg_ui;
     Glib::RefPtr<Gio::SimpleActionGroup> gsteg_ag;  
     Glib::RefPtr<Gtk::TextBuffer> gsteg_txt_buf;

@@ -52,13 +52,24 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_txt_in->set_buffer(gsteg_txt_buf);
 
     //Create the ScrolledWindow to stop TextView auto-resizing:
-    txt_no_scroll = Gtk::manage(new Gtk::ScrolledWindow());
-    txt_no_scroll->add(*gsteg_txt_in);
+    gsteg_txt_no_scroll = Gtk::manage(new Gtk::ScrolledWindow());
+    gsteg_txt_no_scroll->add(*gsteg_txt_in);
+
+    //AboutDialog gubbins:
+    gsteg_about.set_logo_icon_name("help-about");
+    gsteg_about.set_program_name("GSteg");
+    gsteg_about.set_version("1.0");
+    gsteg_about.set_copyright("Ellis Kenyo");
+    gsteg_about.set_comments("GSteg is an application for embedding text within an image.");
+    gsteg_about.set_license_type(Gtk::LICENSE_BSD);
+
+    gsteg_about.set_website("https://www.github.com/elken/gsteg");
+    gsteg_about.set_website_label("Homepage");
 
     //Add widgets to the window:
     gsteg_box.pack_start(*gsteg_menu, Gtk::PACK_SHRINK);
     gsteg_box.pack_start(*gsteg_image, true, true);
-    gsteg_box.pack_start(*txt_no_scroll, true, true);
+    gsteg_box.pack_start(*gsteg_txt_no_scroll, true, true);
 
     show_all_children();
 }
@@ -196,6 +207,7 @@ void GSteg::on_action_decode()
 
 void GSteg::on_action_help_about()
 {
-    std::cout << "Help_about hit." << std::endl;
-    std::cout << gsteg_image_path << std::endl;
+    gsteg_about.show();    
+
+    gsteg_about.present();
 }
