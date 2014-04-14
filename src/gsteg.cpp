@@ -24,22 +24,23 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
   
     //Create and allocate the builder:
     Glib::RefPtr<Gtk::Builder> gsteg_ui = Gtk::Builder::create();
-  
     try
     {
         gsteg_ui->add_from_file("gsteg.ui");
     }
     catch(const Glib::Error& ex)
     {
-        std::cerr << "building menus failed: " <<  ex.what();
+        std::cerr << "Unable to construct menus from ui file. Check for existence." <<  ex.what();
     }
   
     //Get the menubar:
     Glib::RefPtr<Gio::Menu> gmenu = Glib::RefPtr<Gio::Menu>::cast_dynamic(gsteg_ui->get_object("gsteg_menu"));
   
     if(!gmenu)
-      g_warning("gmenu not found");
-  
+    {
+        g_warning("gmenu not found");
+    } 
+
     Gtk::MenuBar* gsteg_menu = new Gtk::MenuBar(gmenu);
   
     //Create and add empty image to window:
@@ -48,6 +49,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     //Create and allocate txt_in:
     gsteg_txt_in = Gtk::manage(new Gtk::TextView());
     gsteg_txt_in->set_wrap_mode(Gtk::WRAP_CHAR);
+    gsteg_txt_in->set_buffer(gsteg_txt_buf);
 
     //Create the ScrolledWindow to stop TextView auto-resizing:
     txt_no_scroll = Gtk::manage(new Gtk::ScrolledWindow());
@@ -57,8 +59,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_box.pack_start(*gsteg_menu, Gtk::PACK_SHRINK);
     gsteg_box.pack_start(*gsteg_image, true, true);
     gsteg_box.pack_start(*txt_no_scroll, true, true);
-  
-  
+
     show_all_children();
 }
 
@@ -86,21 +87,18 @@ void GSteg::on_action_file_open()
             {
                 gsteg_image->set(dialog.get_filename());
                 gsteg_image_path = dialog.get_filename();
-                std::fstream image_in(dialog.get_filename().c_str());
+                image_in.open(dialog.get_filename().c_str());
                 if(image_in.is_open())
                 {
+                    image_in.seekg(0, std::ios::end);
                     const std::streampos size = image_in.tellg();
-                    char* header = new char[54];
-                    char* eBuf = new char [sizeof(int(size)-54)];
-                    char* tBuf = new char [size];
+                    header = new char[54];
+                    eBuf = new char [sizeof(int(size)-54)];
 
                     image_in.seekg(0, std::ios::beg);
                     image_in.read(header, 54);
-                    for(int i = 0; i<54; i++)
-                    {
-                        std::cout << header[i];
-                    }
-                    //std::cout << std::hex << image_in.peek() << std::endl;
+                    image_in.seekg(54);
+                    image_in.read(eBuf, int(size)-54);
                 }
                 else
                 {
@@ -144,12 +142,56 @@ void GSteg::on_action_file_quit()
 
 void GSteg::on_action_encode()
 {
- 
+    Glib::ustring str = gsteg_txt_in->get_buffer()->get_text();
+    itBuf = reinterpret_cast<const char*>(str.c_str());
+
+    if(image_in.is_open())
+    {
+        std::ofstream o("out.bmp", std::ios::binary);
+        if(o.bad() == true)
+        {
+            o << " " << std::endl;
+            o.close();
+        }
+        o.write(header, 54);
+        o << char(3);
+        o.write(itBuf, gsteg_txt_in->get_buffer()->get_char_count());
+        o << char(7);
+        o.write(eBuf, sizeof(eBuf));
+        o.close();
+        image_in.close();
+        delete[] eBuf, itBuf; 
+    }
+    else
+    {
+        std::cout << "Fail: loading image on encode action." << std::endl;
+    }
 }
 
 void GSteg::on_action_decode()
 {
+    if(image_in.is_open())
+    {
+        image_in.seekg(0, std::ios::end);
+        std::streampos size = image_in.tellg();
+        image_in.seekg(55);
+        char* otBuf = new char[int(size)-54];
 
+        for(int i=0;image_in.peek()!=char(7);i++)
+        {
+            otBuf[i] = image_in.get();
+        }
+
+        Glib::ustring str = otBuf;
+        delete[] otBuf;
+
+        gsteg_txt_in->get_buffer()->set_text(str);
+        image_in.close();
+    }
+    else
+    {
+        std::cout << "Fail: Image load on decode action." << std::endl;
+    }
 }
 
 void GSteg::on_action_help_about()

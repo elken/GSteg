@@ -3,11 +3,11 @@ TODONE
 - Encoding works in CLI
 - Decoding works in CLI
 - More OOP approach (Very happy, annoyed I didn't do earlier)
+- Encoding works under Gtkmm context
+- Decoding works under Gtkmm context
 
 TODO
 
-- Get encoding working under Gtkmm context
-- Get decoding working under Gtkmm context
 - Get AboutDialog working (Didn't get to do today, it will be done tomorrow possibly)
 - Plan the GUI (Kind of done, but I won't tick it off yet.)
 - Drink coffee
