@@ -24,9 +24,57 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
   
     //Create and allocate the builder:
     Glib::RefPtr<Gtk::Builder> gsteg_ui = Gtk::Builder::create();
+    Glib::ustring ui_info = 
+    "<interface>"
+        "<menu id='gsteg_menu'>"
+            "<submenu>"
+                "<attribute name='label' translatable='yes'>_File</attribute>"
+                    "<section>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Open</attribute>"
+                            "<attribute name='action'>gsteg.open</attribute>"
+                        "</item>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Save As</attribute>"
+                            "<attribute name='action'>gsteg.saveas</attribute>"
+                        "</item>"
+                    "</section>"
+                    "<section>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Quit</attribute>"
+                            "<attribute name='action'>gsteg.quit</attribute>"
+                        "</item>"
+                    "</section>"
+            "</submenu>"
+            "<submenu>"
+                "<attribute name='label' translatable='yes'>_Encode</attribute>"
+                    "<section>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Encode</attribute>"
+                            "<attribute name='action'>gsteg.encode</attribute>"
+                        "</item>"
+                    "</section>"
+            "</submenu>"
+            "<submenu>"
+                "<attribute name='label' translatable='yes'>_Decode</attribute>"
+                    "<section>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Decode</attribute>"
+                            "<attribute name='action'>gsteg.decode</attribute>"
+                        "</item>"
+                    "</section>"
+            "</submenu>"
+            "<submenu>"
+                "<attribute name='label' translatable='yes'>_Help</attribute>"
+                    "<item>"
+                        "<attribute name='label' translatable='yes'>_About</attribute>"
+                        "<attribute name='action'>gsteg.about</attribute>"
+                    "</item>"
+            "</submenu>"
+    "</menu>";
     try
     {
-        gsteg_ui->add_from_file("gsteg.ui");
+        gsteg_ui->add_from_string(ui_info);
     }
     catch(const Glib::Error& ex)
     {
@@ -63,7 +111,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_about.set_comments("GSteg is an application for embedding text within an image.");
     gsteg_about.set_license_type(Gtk::LICENSE_BSD);
 
-    gsteg_about.set_website("https://www.github.com/elken/gsteg");
+    gsteg_about.set_website("http://www.elken.github.io/GSteg");
     gsteg_about.set_website_label("Homepage");
 
     //Add widgets to the window:
@@ -207,7 +255,15 @@ void GSteg::on_action_decode()
 
 void GSteg::on_action_help_about()
 {
-    gsteg_about.show();    
-
-    gsteg_about.present();
+    int response = gsteg_about.run();    
+    switch (response)
+    {
+        case Gtk::RESPONSE_CANCEL:
+        {
+            gsteg_about.hide();
+        }
+            break;
+        default:
+            break;
+    }
 }

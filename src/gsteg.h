@@ -18,6 +18,7 @@ private:
     void on_action_encode();
     void on_action_decode();
     void on_action_help_about();
+    void on_action_help_about_close();
     void on_action_others();
     void on_action_toggle();    
 
