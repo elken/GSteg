@@ -1,177 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.16.1 -->
 <interface>
-  <requires lib="gtk+" version="3.10"/>
-  <object class="GtkAboutDialog" id="gsteg_help">
-    <property name="can_focus">False</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">GSteg</property>
-    <property name="version">whatever the fuck version I want</property>
-    <property name="comments" translatable="yes">GSteg is free stuff that sucks but I made it so there, suck it Trebek.</property>
-    <property name="website">http://github.com/elken/GSteg</property>
-    <property name="website_label" translatable="yes">Click this thing or don't</property>
-    <property name="logo_icon_name">help-about</property>
-    <property name="license_type">bsd</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="aboutdialog-vbox1">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="aboutdialog-action_area1">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkWindow" id="gsteg_window">
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">GSteg</property>
-    <child>
-      <object class="GtkGrid" id="gsteg_grid">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkMenuBar" id="gsteg_menu">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkMenuItem" id="file_menuitem">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_File</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="file_menu">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkImageMenuItem" id="open_item">
-                        <property name="label">gtk-open</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="save_item">
-                        <property name="label">gtk-save</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="saveas_item">
-                        <property name="label">gtk-save-as</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="quit_item">
-                        <property name="label">gtk-quit</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="help_menuitem">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Help</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkImage" id="img_in">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="stock">gtk-missing-image</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="btn_encode">
-            <property name="label" translatable="yes">Encode</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">3</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="btn_decode">
-            <property name="label" translatable="yes">Decode</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">3</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="txt_in">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
-</interface>
+<menu id='gsteg_menu'>
+    <submenu>
+        <attribute name='label' translatable='yes'>_File</attribute>
+        <section>
+            <item>
+                <attribute name='label' translatable='yes'>_Open</attribute>
+                <attribute name='action'>gsteg.open</attribute>
+            </item>
+            <item>
+                <attribute name='label' translatable='yes'>_Save As</attribute>
+                <attribute name='action'>gsteg.saveas</attribute>
+            </item>
+        </section>
+        <section>
+            <item>
+                <attribute name='label' translatable='yes'>_Quit</attribute>
+                <attribute name='action'>gsteg.quit</attribute>
+            </item>
+        </section>
+    </submenu>
+    <submenu>
+        <attribute name='label' translatable='yes'>_Encode</attribute>
+        <section>
+            <item>
+                <attribute name='label' translatable='yes'>_Encode</attribute>
+                <attribute name='action'>gsteg.encode</attribute>
+            </item>
+        </section>
+    </submenu>
+    <submenu>
+        <attribute name='label' translatable='yes'>_Decode</attribute>
+        <section>
+            <item>
+                <attribute name='label' translatable='yes'>_Decode</attribute>
+                <attribute name='action'>gsteg.decode</attribute>
+            </item>
+        </section>
+    </submenu>
+    <submenu>
+        <attribute name='label' translatable='yes'>_Help</attribute>
+        <item>
+            <attribute name='label' translatable='yes'>_About</attribute>
+            <attribute name='action'>gsteg.about</attribute>
+        </item>
+    </submenu>
+</menu>
