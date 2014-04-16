@@ -139,9 +139,12 @@ void GSteg::on_action_file_open()
         {
             case Gtk::RESPONSE_ACCEPT:
             {
-                gsteg_image->set(dialog.get_filename());
-                image_in.open(dialog.get_filename().c_str());
-                if(image_in.is_open())
+                if(!image_in.is_open())
+                {
+                    gsteg_image->set(dialog.get_filename());
+                    image_in.open(dialog.get_filename().c_str());
+                }
+                else if(image_in.is_open())
                 {
                     image_in.seekg(0, std::ios::end);
                     const std::streampos size = image_in.tellg();
@@ -155,6 +158,7 @@ void GSteg::on_action_file_open()
                     image_in.read(header, headerEnd);
                     image_in.seekg(headerEnd);
                     image_in.read(eBuf, int(size)-headerEnd);
+                    image_in.close();
                 }
                 else
                 {
