@@ -13,14 +13,11 @@ public:
 private:
     //Signal handlers:
     void on_action_file_open();
-    void on_action_file_saveas();
     void on_action_file_quit();
     void on_action_encode();
     void on_action_decode();
     void on_action_help_about();
     void on_action_help_about_close();
-    void on_action_others();
-    void on_action_toggle();    
 
     //Child widgets:
     Gtk::Box gsteg_box;
@@ -34,11 +31,11 @@ private:
     Glib::RefPtr<Gtk::TextBuffer> gsteg_txt_buf;
 
     //Misc variables
-    std::string gsteg_image_path;   
     char* header;
     char* eBuf;
     const char* itBuf;
     const char* otBuf;
+    int dSize;
 
     //Stream objects
     std::fstream image_in;

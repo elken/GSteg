@@ -14,7 +14,6 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_ag = Gio::SimpleActionGroup::create();
   
     gsteg_ag->add_action("open",    sigc::mem_fun(*this, &GSteg::on_action_file_open));
-    gsteg_ag->add_action("saveas",  sigc::mem_fun(*this, &GSteg::on_action_file_saveas));
     gsteg_ag->add_action("quit",    sigc::mem_fun(*this, &GSteg::on_action_file_quit));
     gsteg_ag->add_action("encode",  sigc::mem_fun(*this, &GSteg::on_action_encode));
     gsteg_ag->add_action("decode",  sigc::mem_fun(*this, &GSteg::on_action_decode));
@@ -34,11 +33,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                             "<attribute name='label' translatable='yes'>_Open</attribute>"
                             "<attribute name='action'>gsteg.open</attribute>"
                         "</item>"
-                        "<item>"
-                            "<attribute name='label' translatable='yes'>_Save As</attribute>"
-                            "<attribute name='action'>gsteg.saveas</attribute>"
-                        "</item>"
-                    "</section>"
+                   "</section>"
                     "<section>"
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Quit</attribute>"
@@ -145,14 +140,14 @@ void GSteg::on_action_file_open()
             case Gtk::RESPONSE_ACCEPT:
             {
                 gsteg_image->set(dialog.get_filename());
-                gsteg_image_path = dialog.get_filename();
                 image_in.open(dialog.get_filename().c_str());
                 if(image_in.is_open())
                 {
                     image_in.seekg(0, std::ios::end);
                     const std::streampos size = image_in.tellg();
                     header = new char[54];
-                    eBuf = new char [sizeof(int(size)-54)];
+                    dSize = int(size)-54;
+                    eBuf = new char [dSize];
 
                     image_in.seekg(0, std::ios::beg);
                     image_in.read(header, 54);
@@ -168,30 +163,6 @@ void GSteg::on_action_file_open()
             default:
                 break;
         }
-}
-
-void GSteg::on_action_file_saveas()
-{
-    
-    Gtk::FileChooserDialog dialog("Save Image", Gtk::FILE_CHOOSER_ACTION_SAVE);
-    dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
-    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-
-    Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
-    filter->add_pixbuf_formats();
-    filter->set_name("Images");
-    dialog.add_filter(filter);
-
-    const int response = dialog.run();
-    dialog.hide();
-
-    switch(response)
-    {
-        case Gtk::RESPONSE_ACCEPT:
-            {
-            }
-    }
-
 }
 
 void GSteg::on_action_file_quit()
@@ -216,10 +187,10 @@ void GSteg::on_action_encode()
         o << char(3);
         o.write(itBuf, gsteg_txt_in->get_buffer()->get_char_count());
         o << char(7);
-        o.write(eBuf, sizeof(eBuf));
+        o.write(eBuf, dSize);
         o.close();
         image_in.close();
-        delete[] eBuf, itBuf; 
+        delete[] eBuf, itBuf;
     }
     else
     {
