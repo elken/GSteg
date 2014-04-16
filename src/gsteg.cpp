@@ -73,7 +73,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     }
     catch(const Glib::Error& ex)
     {
-        std::cerr << "Unable to construct menus from ui file. Check for existence." <<  ex.what();
+        msgBox("Unable to load UI", "The UI string is invalid. Correct and try again.", "UI Error", Gtk::MESSAGE_ERROR);
     }
   
     //Get the menubar:
@@ -81,7 +81,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
   
     if(!gmenu)
     {
-        g_warning("gmenu not found");
+        msgBox("Unable to load menu from UI", "Unable to read the menu, or the menu failed to initialize.", "UI Error", Gtk::MESSAGE_ERROR);
     } 
 
     Gtk::MenuBar* gsteg_menu = new Gtk::MenuBar(gmenu);
@@ -145,18 +145,20 @@ void GSteg::on_action_file_open()
                 {
                     image_in.seekg(0, std::ios::end);
                     const std::streampos size = image_in.tellg();
-                    header = new char[54];
-                    dSize = int(size)-54;
+                    image_in.seekg(10);
+                    headerEnd = image_in.peek();
+                    header = new char[headerEnd];
+                    dSize = int(size)-headerEnd;
                     eBuf = new char [dSize];
 
                     image_in.seekg(0, std::ios::beg);
-                    image_in.read(header, 54);
-                    image_in.seekg(54);
-                    image_in.read(eBuf, int(size)-54);
+                    image_in.read(header, headerEnd);
+                    image_in.seekg(headerEnd);
+                    image_in.read(eBuf, int(size)-headerEnd);
                 }
                 else
                 {
-                    std::cout << "Fail" << std::endl;
+                    msgBox("Unable to load image", "The file you selected is unable to be read. Please check and try again", "File error", Gtk::MESSAGE_ERROR);
                 }
             }
                 break;
@@ -172,29 +174,49 @@ void GSteg::on_action_file_quit()
 
 void GSteg::on_action_encode()
 {
-    Glib::ustring str = gsteg_txt_in->get_buffer()->get_text();
-    itBuf = reinterpret_cast<const char*>(str.c_str());
-
     if(image_in.is_open())
     {
-        std::ofstream o("out.bmp", std::ios::binary);
-        if(o.bad() == true)
+        Gtk::FileChooserDialog dialog(("Save Image"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
+        dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+
+        Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
+        filter->add_pixbuf_formats();
+        filter->set_name("Images");
+        dialog.add_filter (filter);
+
+        const int response = dialog.run();
+        dialog.hide();
+ 
+        switch(response)
         {
-            o << " " << std::endl;
-            o.close();
+            case Gtk::RESPONSE_ACCEPT:
+            {
+                image_out.open(dialog.get_filename().c_str());
+                if(image_out.is_open())
+                {
+                    image_out.write(header, headerEnd);
+                    image_out << char(3);
+                    image_out.write(reinterpret_cast<const char*>(gsteg_txt_in->get_buffer()->get_text().c_str()), gsteg_txt_in->get_buffer()->get_char_count());
+                    image_out << char(7);
+                    image_out.write(eBuf, dSize);
+                    image_out.close();
+                    image_out.close();
+                    delete[] eBuf;            
+                }
+                else
+                {
+                    msgBox("Error saving image", "Unable to save this, please try again.", "Save error", Gtk::MESSAGE_ERROR);
+                }
+            }
+                break;
+            default:
+               break; 
         }
-        o.write(header, 54);
-        o << char(3);
-        o.write(itBuf, gsteg_txt_in->get_buffer()->get_char_count());
-        o << char(7);
-        o.write(eBuf, dSize);
-        o.close();
-        image_in.close();
-        delete[] eBuf, itBuf;
     }
     else
     {
-        std::cout << "Fail: loading image on encode action." << std::endl;
+        msgBox("Unable to load image", "The file you selected is unable to be read. Please check and try again", "File error", Gtk::MESSAGE_ERROR);
     }
 }
 
@@ -203,24 +225,19 @@ void GSteg::on_action_decode()
     if(image_in.is_open())
     {
         image_in.seekg(0, std::ios::end);
-        std::streampos size = image_in.tellg();
-        image_in.seekg(55);
-        char* otBuf = new char[int(size)-54];
+        image_in.seekg(headerEnd+1);
 
         for(int i=0;image_in.peek()!=char(7);i++)
         {
-            otBuf[i] = image_in.get();
+            otBuf += char(image_in.get());
         }
 
-        Glib::ustring str = otBuf;
-        delete[] otBuf;
-
-        gsteg_txt_in->get_buffer()->set_text(str);
+        msgBox("The decoded text reads: ", otBuf, "Decoded", Gtk::MESSAGE_INFO);
         image_in.close();
     }
     else
     {
-        std::cout << "Fail: Image load on decode action." << std::endl;
+        msgBox("Unable to load image", "The file you selected is unable to be read. Please check and try again", "File error", Gtk::MESSAGE_ERROR);
     }
 }
 
@@ -232,6 +249,25 @@ void GSteg::on_action_help_about()
         case Gtk::RESPONSE_CANCEL:
         {
             gsteg_about.hide();
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+void GSteg::msgBox(Glib::ustring pstr, Glib::ustring sstr, Glib::ustring title, Gtk::MessageType mt)
+{
+    gsteg_message_box = (new Gtk::MessageDialog(pstr, false, mt, Gtk::BUTTONS_OK)); 
+    gsteg_message_box->set_title(title);
+    gsteg_message_box->set_secondary_text(sstr);
+    int response = gsteg_message_box->run();
+
+    switch(response)
+    {
+        case Gtk::RESPONSE_OK:
+        {
+            gsteg_message_box->hide();
         }
             break;
         default:

@@ -19,13 +19,17 @@ private:
     void on_action_help_about();
     void on_action_help_about_close();
 
+    //Other functions
+    void msgBox(Glib::ustring, Glib::ustring, Glib::ustring, Gtk::MessageType);
+
     //Child widgets:
     Gtk::Box gsteg_box;
     Gtk::Image* gsteg_image;
     Gtk::TextView* gsteg_txt_in;
     Gtk::ScrolledWindow* gsteg_txt_no_scroll; 
     Gtk::AboutDialog gsteg_about;
-    
+    Gtk::MessageDialog* gsteg_message_box;
+
     Glib::RefPtr<Gtk::Builder> gsteg_ui;
     Glib::RefPtr<Gio::SimpleActionGroup> gsteg_ag;  
     Glib::RefPtr<Gtk::TextBuffer> gsteg_txt_buf;
@@ -34,11 +38,13 @@ private:
     char* header;
     char* eBuf;
     const char* itBuf;
-    const char* otBuf;
+    Glib::ustring otBuf;
     int dSize;
+    int headerEnd;
 
     //Stream objects
-    std::fstream image_in;
+    std::ifstream image_in;
+    std::ofstream image_out;
 };
 
 #endif //GSTEG_H
