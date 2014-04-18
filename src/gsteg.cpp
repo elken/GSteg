@@ -162,10 +162,6 @@ void GSteg::on_action_file_open()
                     image_in.read(header, headerEnd);
                     image_in.seekg(headerEnd);
                     image_in.read(eBuf, int(size)-headerEnd);
-                    for(int i=0;i<int(size)-headerEnd;i++)
-                    {
-                        std::cerr << eBuf[i];
-                    }
                 }
                 else
                 {

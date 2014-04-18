@@ -5,10 +5,12 @@ TODONE
 - More OOP approach (Very happy, annoyed I didn't do earlier)
 - Encoding works under Gtkmm context
 - Decoding works under Gtkmm context
+- Got AboutDialog working 
+- Done the GUI (Pretty much)
 
 TODO
 
-- Get AboutDialog working (Didn't get to do today, it will be done tomorrow possibly)
-- Plan the GUI (Kind of done, but I won't tick it off yet.)
+- Imgur upload
+- Test random placement/most efficient placement
 - Drink coffee
 - Jump into a moving train
