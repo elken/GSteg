@@ -14,6 +14,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_ag = Gio::SimpleActionGroup::create();
   
     gsteg_ag->add_action("open",    sigc::mem_fun(*this, &GSteg::on_action_file_open));
+    gsteg_ag->add_action("upload",  sigc::mem_fun(*this, &GSteg::on_action_file_upload));
     gsteg_ag->add_action("quit",    sigc::mem_fun(*this, &GSteg::on_action_file_quit));
     gsteg_ag->add_action("encode",  sigc::mem_fun(*this, &GSteg::on_action_encode));
     gsteg_ag->add_action("decode",  sigc::mem_fun(*this, &GSteg::on_action_decode));
@@ -34,7 +35,13 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                             "<attribute name='action'>gsteg.open</attribute>"
                         "</item>"
                    "</section>"
-                    "<section>"
+                   "<section>"
+                        "<item>"
+                            "<attribute name='label' translatable='yes'>_Upload to Imgur</attribute>"
+                            "<attribute name='action'>gsteg.upload</attribute>"
+                        "</item>"
+                   "</section>"
+                   "<section>"
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Quit</attribute>"
                             "<attribute name='action'>gsteg.quit</attribute>"
@@ -143,9 +150,6 @@ void GSteg::on_action_file_open()
                 {
                     gsteg_image->set(dialog.get_filename());
                     image_in.open(dialog.get_filename().c_str());
-                }
-                else if(image_in.is_open())
-                {
                     image_in.seekg(0, std::ios::end);
                     const std::streampos size = image_in.tellg();
                     image_in.seekg(10);
@@ -158,7 +162,10 @@ void GSteg::on_action_file_open()
                     image_in.read(header, headerEnd);
                     image_in.seekg(headerEnd);
                     image_in.read(eBuf, int(size)-headerEnd);
-                    image_in.close();
+                    for(int i=0;i<int(size)-headerEnd;i++)
+                    {
+                        std::cerr << eBuf[i];
+                    }
                 }
                 else
                 {
@@ -169,6 +176,11 @@ void GSteg::on_action_file_open()
             default:
                 break;
         }
+}
+
+void GSteg::on_action_file_upload()
+{
+    msgBox("Upload", "Upload", "Upload", Gtk::MESSAGE_INFO);
 }
 
 void GSteg::on_action_file_quit()
@@ -204,7 +216,7 @@ void GSteg::on_action_encode()
                     image_out.write(reinterpret_cast<const char*>(gsteg_txt_in->get_buffer()->get_text().c_str()), gsteg_txt_in->get_buffer()->get_char_count());
                     image_out << char(7);
                     image_out.write(eBuf, dSize);
-                    image_out.close();
+                    image_in.close();
                     image_out.close();
                     delete[] eBuf;            
                 }

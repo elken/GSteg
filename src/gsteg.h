@@ -13,6 +13,7 @@ public:
 private:
     //Signal handlers:
     void on_action_file_open();
+    void on_action_file_upload();
     void on_action_file_quit();
     void on_action_encode();
     void on_action_decode();
