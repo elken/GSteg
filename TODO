@@ -7,11 +7,15 @@ TODONE
 - Decoding works under Gtkmm context
 - Got AboutDialog working 
 - Done the GUI (Pretty much)
+- Imgur upload(Abandonded due to network programming being a bag of penis)
+- Keyboard shortcuts
 
 TODO
 
-- Imgur upload
-- Keyboard shortcuts
 - Test random placement/most efficient placement
+- Add more filetype support
+- Buffered UI based on filetype (like the TextBuffer gtkmm example)
+- Also a toolbar maybe
+- Put image in a ScrolledWindow too to remove resize events
 - Drink coffee
 - Jump into a moving train

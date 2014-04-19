@@ -7,21 +7,23 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
 {
     //Default gubbins:
     set_title("GSteg");
-    set_default_size(200, 200);
+    set_default_size(500, 500);
     add(gsteg_box); 
   
     //Define the actions:
     gsteg_ag = Gio::SimpleActionGroup::create();
   
     gsteg_ag->add_action("open",    sigc::mem_fun(*this, &GSteg::on_action_file_open));
-    gsteg_ag->add_action("upload",  sigc::mem_fun(*this, &GSteg::on_action_file_upload));
     gsteg_ag->add_action("quit",    sigc::mem_fun(*this, &GSteg::on_action_file_quit));
     gsteg_ag->add_action("encode",  sigc::mem_fun(*this, &GSteg::on_action_encode));
     gsteg_ag->add_action("decode",  sigc::mem_fun(*this, &GSteg::on_action_decode));
     gsteg_ag->add_action("about",   sigc::mem_fun(*this, &GSteg::on_action_help_about));
   
     insert_action_group("gsteg", gsteg_ag);
-  
+
+    this->add_events(Gdk::KEY_PRESS_MASK);
+    this->signal_key_release_event().connect(sigc::mem_fun(*this, &GSteg::on_key_release));
+
     //Create and allocate the builder:
     Glib::RefPtr<Gtk::Builder> gsteg_ui = Gtk::Builder::create();
     Glib::ustring ui_info = 
@@ -33,18 +35,14 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Open</attribute>"
                             "<attribute name='action'>gsteg.open</attribute>"
-                        "</item>"
-                   "</section>"
-                   "<section>"
-                        "<item>"
-                            "<attribute name='label' translatable='yes'>_Upload to Imgur</attribute>"
-                            "<attribute name='action'>gsteg.upload</attribute>"
+                            "<attribute name='accel'>&lt;Primary&gt;o</attribute>"
                         "</item>"
                    "</section>"
                    "<section>"
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Quit</attribute>"
                             "<attribute name='action'>gsteg.quit</attribute>"
+                            "<attribute name='accel'>&lt;Primary&gt;q</attribute>"
                         "</item>"
                     "</section>"
             "</submenu>"
@@ -54,6 +52,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Encode</attribute>"
                             "<attribute name='action'>gsteg.encode</attribute>"
+                            "<attribute name='accel'>&lt;Primary&gt;e</attribute>"
                         "</item>"
                     "</section>"
             "</submenu>"
@@ -63,6 +62,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                         "<item>"
                             "<attribute name='label' translatable='yes'>_Decode</attribute>"
                             "<attribute name='action'>gsteg.decode</attribute>"
+                            "<attribute name='accel'>&lt;Primary&gt;d</attribute>"
                         "</item>"
                     "</section>"
             "</submenu>"
@@ -71,6 +71,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
                     "<item>"
                         "<attribute name='label' translatable='yes'>_About</attribute>"
                         "<attribute name='action'>gsteg.about</attribute>"
+                        "<attribute name='accel'>F1</attribute>"
                     "</item>"
             "</submenu>"
     "</menu>";
@@ -82,7 +83,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     {
         msgBox("Unable to load UI", "The UI string is invalid. Correct and try again.", "UI Error", Gtk::MESSAGE_ERROR);
     }
-  
+
     //Get the menubar:
     Glib::RefPtr<Gio::Menu> gmenu = Glib::RefPtr<Gio::Menu>::cast_dynamic(gsteg_ui->get_object("gsteg_menu"));
   
@@ -91,7 +92,7 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
         msgBox("Unable to load menu from UI", "Unable to read the menu, or the menu failed to initialize.", "UI Error", Gtk::MESSAGE_ERROR);
     } 
 
-    Gtk::MenuBar* gsteg_menu = new Gtk::MenuBar(gmenu);
+    gsteg_menu = new Gtk::MenuBar(gmenu);
   
     //Create and add empty image to window:
     gsteg_image = Gtk::manage(new Gtk::Image());
@@ -105,6 +106,10 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_txt_no_scroll = Gtk::manage(new Gtk::ScrolledWindow());
     gsteg_txt_no_scroll->add(*gsteg_txt_in);
 
+    //Create the ScrolledWindow to stop Image auto-resizing:
+    gsteg_img_no_scroll = Gtk::manage(new Gtk::ScrolledWindow());
+    gsteg_img_no_scroll->add(*gsteg_image);
+
     //AboutDialog gubbins:
     gsteg_about.set_logo_icon_name("help-about");
     gsteg_about.set_program_name("GSteg");
@@ -112,13 +117,11 @@ GSteg::GSteg() : gsteg_box(Gtk::ORIENTATION_VERTICAL)
     gsteg_about.set_copyright("Ellis Kenyo");
     gsteg_about.set_comments("GSteg is an application for embedding text within an image.");
     gsteg_about.set_license_type(Gtk::LICENSE_BSD);
-
     gsteg_about.set_website("http://www.elken.github.io/GSteg");
-    gsteg_about.set_website_label("Homepage");
 
     //Add widgets to the window:
     gsteg_box.pack_start(*gsteg_menu, Gtk::PACK_SHRINK);
-    gsteg_box.pack_start(*gsteg_image, true, true);
+    gsteg_box.pack_start(*gsteg_img_no_scroll, true, true);
     gsteg_box.pack_start(*gsteg_txt_no_scroll, true, true);
 
     show_all_children();
@@ -150,10 +153,11 @@ void GSteg::on_action_file_open()
                 {
                     gsteg_image->set(dialog.get_filename());
                     image_in.open(dialog.get_filename().c_str());
-                    image_in.seekg(0, std::ios::end);
-                    const std::streampos size = image_in.tellg();
                     image_in.seekg(10);
                     headerEnd = image_in.peek();
+                    image_in.seekg(0, std::ios::end);
+                    const std::streampos size = image_in.tellg();
+                    std::cerr << size;
                     header = new char[headerEnd];
                     dSize = int(size)-headerEnd;
                     eBuf = new char [dSize];
@@ -172,11 +176,6 @@ void GSteg::on_action_file_open()
             default:
                 break;
         }
-}
-
-void GSteg::on_action_file_upload()
-{
-    msgBox("Upload", "Upload", "Upload", Gtk::MESSAGE_INFO);
 }
 
 void GSteg::on_action_file_quit()
@@ -205,6 +204,7 @@ void GSteg::on_action_encode()
             case Gtk::RESPONSE_ACCEPT:
             {
                 image_out.open(dialog.get_filename().c_str());
+                std::cerr << header[10] << std::endl << header[9] << std::endl;
                 if(image_out.is_open())
                 {
                     image_out.write(header, headerEnd);
@@ -266,6 +266,35 @@ void GSteg::on_action_help_about()
         default:
             break;
     }
+}
+
+bool GSteg::on_key_release(GdkEventKey* event)
+{
+   if((event->keyval == GDK_KEY_o) && (event->state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_MOD1_MASK)) == GDK_CONTROL_MASK)    
+   {
+       on_action_file_open();
+       return true;
+   }
+   else if((event->keyval == GDK_KEY_q) && (event->state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_MOD1_MASK)) == GDK_CONTROL_MASK)
+   {
+       on_action_file_quit();
+       return true;
+   }
+   else if((event->keyval == GDK_KEY_e) && (event->state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_MOD1_MASK)) == GDK_CONTROL_MASK)
+   {
+       on_action_encode();
+       return true;
+   }
+   else if((event->keyval == GDK_KEY_d) && (event->state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_MOD1_MASK)) == GDK_CONTROL_MASK)
+   {
+       on_action_decode();
+       return true;
+   }
+   else if(event->keyval == GDK_KEY_F1)
+   {
+       on_action_help_about();
+       return true;
+   }
 }
 
 void GSteg::msgBox(Glib::ustring pstr, Glib::ustring sstr, Glib::ustring title, Gtk::MessageType mt)
