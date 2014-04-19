@@ -149,6 +149,10 @@ void GSteg::on_action_file_open()
         {
             case Gtk::RESPONSE_ACCEPT:
             {
+                if(image_in.is_open())
+                {
+                    msgBox("Image already loaded", "Are you sure you want to load a different image?", "Image load error", Gtk::MESSAGE_ERROR);
+                }
                 if(!image_in.is_open())
                 {
                     gsteg_image->set(dialog.get_filename());
