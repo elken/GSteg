@@ -22,6 +22,8 @@ private:
 
     //Other functions
     void msgBox(Glib::ustring, Glib::ustring, Glib::ustring, Gtk::MessageType);
+    void msgBox(Glib::ustring, Glib::ustring, Gtk::MessageType);
+    void msgBox(Glib::ustring);
 
     //Child widgets:
     Gtk::Box gsteg_box;
@@ -46,6 +48,7 @@ private:
     int headerEnd;
     int eStart;
     int eEnd;
+    std::streampos size;
 
     //Stream objects
     std::ifstream image_in;

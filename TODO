@@ -9,6 +9,8 @@ TODONE
 - Done the GUI (Pretty much)
 - Imgur upload(Abandonded due to network programming being a bag of penis)
 - Keyboard shortcuts
+- Overload msgBox to include optional button selection, and just the ability to go "msgBox("Test");" if I want
+- Put image in a ScrolledWindow too to remove resize events
 
 TODO
 
@@ -16,7 +18,6 @@ TODO
 - Add more filetype support
 - Buffered UI based on filetype (like the TextBuffer gtkmm example)
 - Also a toolbar maybe
-- Put image in a ScrolledWindow too to remove resize events
-- Overload msgBox to include optional button selection, and just the ability to go "msgBox("Test");" if I want
+- Header display area
 - Drink coffee
 - Jump into a moving train

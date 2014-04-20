@@ -138,7 +138,7 @@ void GSteg::on_action_file_open()
         dialog.add_button (Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 
         Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
-        filter->add_pixbuf_formats();
+        filter->add_mime_type("image/bmp");
         filter->set_name("Images");
         dialog.add_filter (filter);
 
@@ -151,7 +151,33 @@ void GSteg::on_action_file_open()
             {
                 if(image_in.is_open())
                 {
-                    msgBox("Image already loaded", "Are you sure you want to load a different image?", "Image load error", Gtk::MESSAGE_ERROR);
+                    Glib::ustring pstr = "Image already loaded.";
+                    Glib::ustring title = "Image load error.";
+                    Glib::ustring sstr = "An image is already loaded, proceed?";
+
+                    gsteg_message_box = (new Gtk::MessageDialog(pstr, false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK_CANCEL)); 
+                    gsteg_message_box->set_title(title);
+                    gsteg_message_box->set_secondary_text(sstr);
+                    int response = gsteg_message_box->run();
+                
+                    switch(response)
+                    {
+                        case Gtk::RESPONSE_OK:
+                        {
+                            gsteg_image->set(dialog.get_filename());
+                            image_in.close();
+                            image_in.open(dialog.get_filename().c_str());
+                            gsteg_message_box->hide();
+                        }
+                            break;
+                        case Gtk::RESPONSE_CANCEL:
+                        {
+                            gsteg_message_box->hide();
+                        }
+                            break;
+                        default:
+                            break;
+                    }                
                 }
                 if(!image_in.is_open())
                 {
@@ -160,8 +186,7 @@ void GSteg::on_action_file_open()
                     image_in.seekg(10);
                     headerEnd = image_in.peek();
                     image_in.seekg(0, std::ios::end);
-                    const std::streampos size = image_in.tellg();
-                    std::cerr << size;
+                    size = image_in.tellg();
                     header = new char[headerEnd];
                     dSize = int(size)-headerEnd;
                     eBuf = new char [dSize];
@@ -171,7 +196,7 @@ void GSteg::on_action_file_open()
                     image_in.seekg(headerEnd);
                     image_in.read(eBuf, int(size)-headerEnd);
                 }
-                else
+                else if(image_in.fail())
                 {
                     msgBox("Unable to load image", "The file you selected is unable to be read. Please check and try again", "File error", Gtk::MESSAGE_ERROR);
                 }
@@ -196,7 +221,7 @@ void GSteg::on_action_encode()
         dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 
         Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
-        filter->add_pixbuf_formats();
+        filter->add_mime_type("image/bmp");
         filter->set_name("Images");
         dialog.add_filter (filter);
 
@@ -208,29 +233,33 @@ void GSteg::on_action_encode()
             case Gtk::RESPONSE_ACCEPT:
             {
                 image_out.open(dialog.get_filename().c_str());
-                std::cerr << header[10] << std::endl << header[9] << std::endl;
-                if(image_out.is_open())
+                image_out.write(header, headerEnd);
+                image_out.seekp(2);
+                image_out << char(size+gsteg_txt_in->get_buffer()->get_char_count());
+                image_out.seekp(34);
+                image_out << char(dSize + gsteg_txt_in->get_buffer()->get_char_count());
+                image_out.seekp(headerEnd);
+                image_out << char(3);
+                if((int)gsteg_txt_in->get_buffer()->get_char_count()==0)
                 {
-                    image_out.write(header, headerEnd);
-                    image_out << char(3);
-                    image_out.write(reinterpret_cast<const char*>(gsteg_txt_in->get_buffer()->get_text().c_str()), gsteg_txt_in->get_buffer()->get_char_count());
-                    image_out << char(7);
-                    image_out.write(eBuf, dSize);
-                    image_in.close();
-                    image_out.close();
-                    delete[] eBuf;            
+                    msgBox("TextView is empty. Please enter some text.");
+                    break;
                 }
-                else
-                {
-                    msgBox("Error saving image", "Unable to save this, please try again.", "Save error", Gtk::MESSAGE_ERROR);
-                }
+                image_out.write(reinterpret_cast<const char*>(gsteg_txt_in->get_buffer()->get_text().c_str()), gsteg_txt_in->get_buffer()->get_char_count());
+                image_out << char(7);
+                image_out.write(eBuf, dSize);
+                image_in.close();
+                image_out.close();
+                delete[] eBuf;            
+                gsteg_image->clear();
+                msgBox("Encode successful.", "Encode success", Gtk::MESSAGE_INFO);
             }
                 break;
             default:
                break; 
         }
     }
-    else
+    else if(image_in.fail())
     {
         msgBox("Unable to load image", "The file you selected is unable to be read. Please check and try again", "File error", Gtk::MESSAGE_ERROR);
     }
@@ -250,6 +279,7 @@ void GSteg::on_action_decode()
 
         msgBox("The decoded text reads: ", otBuf, "Decoded", Gtk::MESSAGE_INFO);
         image_in.close();
+        gsteg_image->clear();
     }
     else
     {
@@ -299,6 +329,9 @@ bool GSteg::on_key_release(GdkEventKey* event)
        on_action_help_about();
        return true;
    }
+   else if(event->keyval == GDK_KEY_F2)
+   {
+   }
 }
 
 void GSteg::msgBox(Glib::ustring pstr, Glib::ustring sstr, Glib::ustring title, Gtk::MessageType mt)
@@ -306,6 +339,41 @@ void GSteg::msgBox(Glib::ustring pstr, Glib::ustring sstr, Glib::ustring title, 
     gsteg_message_box = (new Gtk::MessageDialog(pstr, false, mt, Gtk::BUTTONS_OK)); 
     gsteg_message_box->set_title(title);
     gsteg_message_box->set_secondary_text(sstr);
+    int response = gsteg_message_box->run();
+
+    switch(response)
+    {
+        case Gtk::RESPONSE_OK:
+        {
+            gsteg_message_box->hide();
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+void GSteg::msgBox(Glib::ustring pstr, Glib::ustring title, Gtk::MessageType mt)
+{
+    gsteg_message_box = (new Gtk::MessageDialog(pstr, false, mt, Gtk::BUTTONS_OK)); 
+    gsteg_message_box->set_title(title);
+    int response = gsteg_message_box->run();
+
+    switch(response)
+    {
+        case Gtk::RESPONSE_OK:
+        {
+            gsteg_message_box->hide();
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+void GSteg::msgBox(Glib::ustring str)
+{
+    gsteg_message_box = (new Gtk::MessageDialog(str, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK));
     int response = gsteg_message_box->run();
 
     switch(response)
