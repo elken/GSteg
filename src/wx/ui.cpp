@@ -13,8 +13,8 @@ END_EVENT_TABLE()
 UI::UI(const wxString& title, int xpos, int ypos, int w, int h) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(w, h))
 {
     CreateBars(m_pMenuBar, m_pFileMenu, m_pEncodeMenu, m_pDecodeMenu, m_pHelpMenu);
-
 }
+
 UI::~UI(){}
 
 void UI::CreateBars(wxMenuBar  *m_pMenuBar, wxMenu *m_pFileMenu, wxMenu *m_pEncodeMenu, wxMenu *m_pDecodeMenu, wxMenu *m_pHelpMenu)
@@ -53,16 +53,16 @@ void UI::CreateBars(wxMenuBar  *m_pMenuBar, wxMenu *m_pFileMenu, wxMenu *m_pEnco
 
 void UI::OnOpen(wxCommandEvent &event)
 {
-    wxFileDialog *OpenDialog = new wxFileDialog(this, _T("Choose a file"), _(""), _(""), _("*.*"), wxFD_OPEN);
-    if (OpenDialog->ShowModal() == wxID_OK)
-    {
-        wxString path = OpenDialog->GetPath();
-        path.IsAscii() ?
-            SetStatusText(_T("Loaded")) :
-            SetStatusText(_T("Load Failed"));
+	wxFileDialog *OpenDialog = new wxFileDialog(this, _T("Choose a file"), _(""), _(""), _("*.*"), wxFD_OPEN);
+	if (OpenDialog->ShowModal() == wxID_OK)
+	{
+		wxString path = OpenDialog->GetPath();
+		path.IsAscii() ?
+			SetStatusText(_T("Loaded")) :
+			SetStatusText(_T("Load Failed"));
 
-    }
-    OpenDialog->Close(); // Or OpenDialog->Destroy() ?
+	}
+	OpenDialog->Close();
 }
 
 void UI::OnSave(wxCommandEvent &event)

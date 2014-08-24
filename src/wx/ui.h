@@ -2,6 +2,7 @@
 #define UI_H
 
 #include <wx/wx.h>
+#include "panel.h"
 
 class UI : public wxFrame
 {

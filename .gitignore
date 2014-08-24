@@ -18,3 +18,5 @@
 # Temp crap nobody needs or wants
 *.pyc
 *.*~
+
+/vs2013
