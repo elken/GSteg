@@ -1,4 +1,4 @@
-project(gsteg CXX)
+project(wxsteg CXX)
 cmake_minimum_required(VERSION 2.8)
 aux_source_directory(./src/wx SRC_LIST)
 find_package(wxWidgets COMPONENTS core base REQUIRED)
