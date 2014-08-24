@@ -1,13 +1,13 @@
-GSteg
+GSteg (Soon to be wxSteg)
 ======
 
-A Gtkmm steg library application thing I am doing what has things and bits in it. And slots. And maybe a signal.
+A Gtkmm (soon to be wxWidgets) steg library application thing I am doing what has things and bits in it. And slots. And maybe a signal.
 
 
 Install
 ======
 
-Basic CMake install process
+Basic CMake install process (should be the same after wx port)
 
 - `mkdir build`
 - `cd build`
